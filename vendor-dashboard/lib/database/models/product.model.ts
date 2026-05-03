@@ -70,6 +70,7 @@ const productSchema = new mongoose.Schema({
     vendor: {
         type: Object
     },
+    questions: Array<{ question: string, answer: string }>,
     subProducts: [
         {
             sku: String,
