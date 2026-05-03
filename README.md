@@ -2,7 +2,7 @@
 
 A full-stack multi-vendor e-commerce marketplace inspired by Digikala, built with Next.js, Expo, and modern full-stack architecture.
 
-> Built by **mahiDev** as a real-world portfolio and educational project.
+> Built by **MahiDev** as a real-world portfolio and educational project.
 
 ---
 
