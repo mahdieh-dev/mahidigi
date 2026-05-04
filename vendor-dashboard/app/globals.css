@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.logo-icon {
+  color: #000000;
+}
+
+[data-mantine-color-scheme='dark'] .logo-icon {
+  color: #ffffff;
+}

@@ -79,7 +79,7 @@ export const checkVendor = async (vendorId: string) => {
         }
 
         return {
-            message: "Vnedor found"
+            message: "Vendor found",
             success: true
         }
     } catch (error: any) {

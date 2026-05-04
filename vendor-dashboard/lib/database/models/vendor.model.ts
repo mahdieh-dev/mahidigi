@@ -41,7 +41,7 @@ const vendorSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     commission: {
         type: Number
@@ -53,13 +53,13 @@ const vendorSchema = new mongoose.Schema({
 })
 // sign in vendor with JWT
 vendorSchema.methods.getJWTToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET), {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES
-    }
+    })
 }
 
 // comparing the password for vendor
-vendorSchema.methods.comparePassword = async function(enteredPassword: string) {
+vendorSchema.methods.comparePassword = async function (enteredPassword: string) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
 

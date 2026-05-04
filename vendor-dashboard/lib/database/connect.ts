@@ -1,4 +1,6 @@
-import mongoose, {Mongoose} from "mongoose"
+import mongoose, { Mongoose } from "mongoose"
+const dns = require('node:dns');
+
 const MONGODB_URL = process.env.MONGODB_URL
 
 interface MongooseConnection {
@@ -15,11 +17,14 @@ if (!cached) {
     }
 }
 
-export const connectToDatabase = async() => {
+export const connectToDatabase = async () => {
     if (cached.conn) return cached.conn
     if (!MONGODB_URL) throw new Error("Missing MongoDB URL!")
 
-    cached.promise = cached.promise || mongoose.connect(MONGODB_URL, {bufferCommands: false})
+
+    dns.setServers(['1.1.1.1', '1.0.0.1']);
+
+    cached.promise = cached.promise || mongoose.connect(MONGODB_URL, { bufferCommands: false })
     cached.conn = await cached.promise
     return cached.conn
 }
