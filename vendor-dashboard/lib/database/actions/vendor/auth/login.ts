@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { connectToDatabase } from "./../../../connect";
 import Vendor from "@/lib/database/models/vendor.model";
 
-export const loginVendor = async (email: string, password: string) => {
+export const loginVendor = async ({ email, password }: { email: string, password: string }) => {
     try {
         if (!email || !password) {
             return {
