@@ -61,3 +61,26 @@ export const sizeAnalytics = async () => {
         console.log(error)
     }
 }
+
+// get top selling products for vendor
+export const getTopSellingProducts = async () => {
+    try {
+        await connectToDatabase()
+        const vendorObjectId = await verify_vendor()
+
+        let topSellingProducts = await Product.find({
+            "vendor._id": vendorObjectId
+        }).sort({ "subProducts.sold": -1 }).limit(5).lean()
+        const pieChartData = topSellingProducts.map(product => ({
+            name: product.name,
+            value: product.subProducts[0].sold,
+        }))
+        return JSON.parse(JSON.stringify(pieChartData))
+    } catch (error: any) {
+        console.log(error)
+        return {
+            success: false,
+            message: error
+        }
+    }
+}

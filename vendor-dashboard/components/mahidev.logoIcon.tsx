@@ -1,13 +1,18 @@
+"use client"
+
+import { useId } from "react"
 
 type MahiDevLogoIconProps = {
-    size?: number;
-    className?: string;
-};
+    size?: number
+    className?: string
+}
 
 export function MahiDevLogoIcon({
     size = 64,
     className,
 }: MahiDevLogoIconProps) {
+    const gradientId = useId()
+
     return (
         <svg
             width={size}
@@ -20,7 +25,7 @@ export function MahiDevLogoIcon({
         >
             <defs>
                 <linearGradient
-                    id="mahidev-m-gradient"
+                    id={gradientId}
                     x1="369"
                     y1="190"
                     x2="369"
@@ -33,59 +38,22 @@ export function MahiDevLogoIcon({
                 </linearGradient>
             </defs>
 
-            {/* Left < shape */}
             <path
-                d="
-          M30 304
-          L225 185
-          L225 258
-          L94 341
-          L94 397
-          L225 480
-          L225 527
-          L30 398
-          Z
-        "
+                d="M30 304 L225 185 L225 258 L94 341 L94 397 L225 480 L225 527 L30 398 Z"
                 fill="currentColor"
             />
 
-            {/* Center M */}
             <path
-                d="
-          M250 190
-          L398 349
-          L488 263
-          L488 548
-          L436 590
-          L436 394
-          L393 433
-          L303 337
-          L303 600
-          L250 570
-          Z
-        "
-                fill="url(#mahidev-m-gradient)"
+                d="M250 190 L398 349 L488 263 L488 548 L436 590 L436 394 L393 433 L303 337 L303 600 L250 570 Z"
+                fill={`url(#${gradientId})`}
             />
 
-            {/* Right D */}
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"
-                d="
-          M513 181
-          L708 298
-          L708 414
-          L513 529
-          Z
-
-          M574 287
-          L644 329
-          L644 380
-          L574 422
-          Z
-        "
+                d="M513 181 L708 298 L708 414 L513 529 Z M574 287 L644 329 L644 380 L574 422 Z"
                 fill="currentColor"
             />
         </svg>
-    );
+    )
 }

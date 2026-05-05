@@ -33,7 +33,7 @@ const HomePage = () => {
       <Navbar />
       {
         vendor && !vendor?.verified && (
-          <div className="flex items-center justify-center bg-red-100">
+          <div className="flex items-center justify-center bg-red-100 text-black">
             <b>Note:</b> You&apos;re not yet verified by an admin, so you don&apos;t have any access to Dashboard!!
           </div>
         )

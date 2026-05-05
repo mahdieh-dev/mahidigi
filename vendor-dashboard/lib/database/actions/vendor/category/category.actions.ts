@@ -17,46 +17,69 @@ cloudinary.v2.config({
 export const createCategory = async (name: string, images: string[]) => {
     try {
         await connectToDatabase()
+
         const test = await Category.findOne({ name })
+
         if (test) {
             return {
                 message: "Category already exists, try a different name.",
                 success: false,
-                categories: []
+                categories: [],
             }
         }
-        const uploadImagesToCloudinary = images.map(async (base64Image: any) => {
+
+        const uploadImagesToCloudinary = images.map(async (base64Image: string) => {
             const buffer = base64ToBuffer(base64Image)
+
             const formData = new FormData()
             formData.append("file", new Blob([buffer], { type: "image/jpeg" }))
             formData.append("upload_preset", "website")
+
             const response = await fetch(
-                `https://api.cloudinary.com/v1-1/${process.env.CLOUDINARY_NAME}/image/upload`,
+                `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`,
                 {
                     method: "POST",
-                    body: formData
+                    body: formData,
                 }
             )
-            return response.json
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data?.error?.message || "Cloudinary upload failed")
+            }
+
+            return data
         })
+
         const cloudinaryImages = await Promise.all(uploadImagesToCloudinary)
+
         const imageUrls = cloudinaryImages.map((img) => ({
-            url: img.secret_url,
+            url: img.secure_url,
             public_id: img.public_id,
         }))
+
         await new Category({
             name,
             slug: slugify(name),
-            images: imageUrls
+            images: imageUrls,
         }).save()
-        const categories = (await Category.find()).sort({ updatedAt: -1 })
+
+        const categories = await Category.find().sort({ updatedAt: -1 })
+
         return {
             success: true,
             message: `Category ${name} has been successfully created.`,
-            categories: JSON.parse(JSON.stringify(categories))
+            categories: JSON.parse(JSON.stringify(categories)),
         }
     } catch (error: any) {
         console.log(error)
+
+        return {
+            success: false,
+            message: error?.message || "Something went wrong while creating category.",
+            categories: [],
+        }
     }
 }
 
@@ -64,24 +87,42 @@ export const createCategory = async (name: string, images: string[]) => {
 export const deleteCategory = async (id: string) => {
     try {
         await connectToDatabase()
+
         const category = await Category.findByIdAndDelete(id)
+
         if (!category) {
             return {
                 message: "Category not found with this ID!",
-                success: false
+                success: false,
+                categories: [],
             }
         }
-        const imagePublicIds = category.images.map((image: any) => image.public_url)
-        const deleteImagePromises = imagePublicIds.map((publicId: string) => cloudinary.v2.uploader.destroy(publicId))
+
+        const imagePublicIds = category.images
+            ?.map((image: any) => image.public_id)
+            .filter(Boolean) || []
+
+        const deleteImagePromises = imagePublicIds.map((publicId: string) =>
+            cloudinary.v2.uploader.destroy(publicId)
+        )
+
         await Promise.all(deleteImagePromises)
+
         const categories = await Category.find().sort({ updatedAt: -1 })
+
         return {
             success: true,
-            message: "Successfully deleted Category and its associated images in cloudinary",
-            categories: JSON.parse(JSON.stringify(categories))
+            message: "Successfully deleted Category and its associated images in Cloudinary.",
+            categories: JSON.parse(JSON.stringify(categories)),
         }
     } catch (error: any) {
         console.log(error)
+
+        return {
+            success: false,
+            message: error?.message || "Something went wrong while deleting category.",
+            categories: [],
+        }
     }
 }
 
@@ -104,6 +145,10 @@ export const updateCategory = async (id: string, name: string) => {
         }
     } catch (error: any) {
         console.log(error)
+        return {
+            success: false,
+            message: error
+        }
     }
 }
 
@@ -111,7 +156,7 @@ export const updateCategory = async (id: string, name: string) => {
 export const getAllCategories = async () => {
     try {
         await connectToDatabase()
-        const categories = (await Category.find()).toSorted({ updatedAt: -1 })
+        const categories = await Category.find().sort({ updatedAt: -1 })
         return JSON.parse(JSON.stringify(categories))
     } catch (error: any) {
         console.log(error)
