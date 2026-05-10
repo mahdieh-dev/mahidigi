@@ -160,7 +160,7 @@ export const updateSubCategory = async (id: string, name: string, parent: string
 
         const updatedParent: mongoose.Types.ObjectId | null = parent && mongoose.Types.ObjectId.isValid(parent) ? new mongoose.Types.ObjectId(parent) : null
         const slug = slugify(name)
-        
+
         await SubCategory.findByIdAndUpdate(id, { name, parent: updatedParent, slug })
         const subCategories = await SubCategory.find().sort({ updatedAt: -1 })
 

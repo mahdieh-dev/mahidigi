@@ -63,16 +63,16 @@ function VendorDashboardPage() {
             <div className='titleStyle'>Orders</div>
             <div className='flex justify-evenly items-center my-5'>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.totalSales} Rials Total Orders
+                    <HiCurrencyRupee size={100} /> {allOrdersData?.totalSales} USD Total Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastWeekSales} Rials Last Week Orders
+                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastWeekSales} USD Last Week Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastMonthSales} Rials Last Month Orders
+                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastMonthSales} USD Last Month Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.growthPercentage} Rials Growth Percentage
+                    <HiCurrencyRupee size={100} /> {allOrdersData?.growthPercentage} USD Growth Percentage
                 </div>
             </div>
             <div className='my-5'>
@@ -106,7 +106,7 @@ function VendorDashboardPage() {
                                                 {order?.user?.email}
                                             </TableCell>
                                             <TableCell style={{ border: "2px solid black" }}>
-                                                Rials {order?.total}
+                                                USD {order?.total}
                                             </TableCell>
                                             <TableCell style={{ border: "2px solid black" }}>
                                                 {order.isPaid ? (
