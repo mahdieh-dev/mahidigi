@@ -10,7 +10,7 @@ const couponSchema = new mongoose.Schema({
         maxLength: 10
     },
     vendor: {
-        type: String,
+        type: Object
     },
     startDate: {
         type: String,

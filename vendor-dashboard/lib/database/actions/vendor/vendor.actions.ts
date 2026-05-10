@@ -4,6 +4,7 @@ import { verify_vendor } from "@/utils"
 import Vendor from "../../models/vendor.model"
 import { connectToDatabase } from "../../connect"
 import mongoose from "mongoose"
+import { cookies } from "next/headers"
 const { ObjectId } = mongoose.Types
 
 
@@ -16,6 +17,7 @@ export const getVendorCookiesAndFetchVendor = async () => {
 
         const vendor = await Vendor.findById(vendorObjectId)
         if (!vendorObjectId) {
+            const cookieStore = await cookies()
             cookieStore.delete("vendor_token")
             return {
                 message: "Vendor does not exist",

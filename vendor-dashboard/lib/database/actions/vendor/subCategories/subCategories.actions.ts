@@ -113,7 +113,7 @@ export const createSubCategory = async (name: string, parent: string, images: an
     } catch (error: any) {
         console.log(error)
         return {
-            message: error,
+            message: error.message || "Failed to create subCategory",
             success: false
         }
     }
@@ -159,8 +159,9 @@ export const updateSubCategory = async (id: string, name: string, parent: string
         await connectToDatabase()
 
         const updatedParent: mongoose.Types.ObjectId | null = parent && mongoose.Types.ObjectId.isValid(parent) ? new mongoose.Types.ObjectId(parent) : null
-
-        await SubCategory.findByIdAndUpdate(id, { name, parent: updatedParent })
+        const slug = slugify(name)
+        
+        await SubCategory.findByIdAndUpdate(id, { name, parent: updatedParent, slug })
         const subCategories = await SubCategory.find().sort({ updatedAt: -1 })
 
         return {

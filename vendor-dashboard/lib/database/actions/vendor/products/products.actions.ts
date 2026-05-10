@@ -367,7 +367,7 @@ export const getEntireProductById = async (id: string) => {
         console.log(error)
         return {
             message: error,
-            success: false;
+            success: false
         }
     }
 }

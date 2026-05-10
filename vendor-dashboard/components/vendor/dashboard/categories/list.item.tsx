@@ -45,7 +45,7 @@ const CategoryListItem = ({ category, setCategories }) => {
 
     return (
         <div>
-            <li className="flex p-2.5 bg-blue-400 mt-2.5 text-white font-bold items-center justify-center">
+            <li className="flex p-2.5 bg-blue-400 mt-2.5 text-white font-bold items-center justify-between">
                 <TextInput
                     value={name ? name : category.name}
                     onChange={e => setName(e.target.value)}

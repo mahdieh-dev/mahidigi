@@ -18,7 +18,7 @@ export const createCoupon = async (coupon: string, discount: number, startDate: 
             }
         }
         const test = await Coupon.findOne({ coupon })
-        if (!test) {
+        if (test) {
             return {
                 success: false,
                 message: "Coupon already exists, try a different coupon name."
@@ -29,17 +29,22 @@ export const createCoupon = async (coupon: string, discount: number, startDate: 
         }).save()
 
         const vendorCoupons = await Coupon.find({
-            "vendor._id": vendorId,
+            "vendor._id": new ObjectId(vendorId),
         }).sort({
             updatedAt: -1
         })
 
         return {
+            success: true,
             message: `Coupon ${coupon} has been successfully created.`,
-            coupon: JSON.parse(JSON.stringify(vendorCoupons))
+            coupons: JSON.parse(JSON.stringify(vendorCoupons))
         }
     } catch (error: any) {
         console.log(error)
+        return {
+            success: false,
+            message: error
+        }
     }
 }
 
@@ -71,12 +76,16 @@ export const deleteCoupon = async (couponId: string, vendorId: string) => {
 
         return {
             message: "Successfully deleted!",
-            coupons: vendorCoupons,
+            coupons: JSON.parse(JSON.stringify(vendorCoupons)),
             success: true
         }
 
     } catch (error: any) {
         console.log(error)
+        return {
+            message: error,
+            success: false
+        }
     }
 }
 
@@ -100,11 +109,15 @@ export const updateCoupon = async (couponId: string, coupon: string, discount: n
         const vendorCoupons = await Coupon.find({ "vendor._id": vendorObjectId }).sort({ updatedAt: -1 })
         return {
             message: "Successfully updated!",
-            coupons: vendorCoupons,
+            coupons: JSON.parse(JSON.stringify(vendorCoupons)),
             success: true
         }
     } catch (error: any) {
         console.log(error)
+        return {
+            message: error,
+            success: false
+        }
     }
 }
 
@@ -115,7 +128,7 @@ export const getAllCoupons = async (vendorId: string) => {
         const vendorObjectId = new ObjectId(vendorId)
         const coupons = await Coupon.find({ "vendor._id": vendorObjectId }).sort({ updatedAt: -1 }).lean()
 
-        if (!coupons) {
+        if (!coupons || !coupons.length) {
             return {
                 message: "No vendor or created vendor coupon found with this Id!",
                 success: false
@@ -129,5 +142,9 @@ export const getAllCoupons = async (vendorId: string) => {
         }
     } catch (error: any) {
         console.log(error)
+        return {
+            message: error,
+            success: false
+        }
     }
 }
