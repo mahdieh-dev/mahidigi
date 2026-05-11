@@ -17,103 +17,189 @@ cloudinary.v2.config({
 })
 
 // creation of a product for vendor
-export const createProduct = async (
-    {
-        vendorId,
-        sku,
-        color,
-        images,
-        sizes,
-        discount,
-        name,
-        description,
-        longDescription,
-        brand,
-        details,
-        questions,
-        category,
-        subCategories,
-        benefits,
-        ingredients,
-        parent
+export const createProduct = async ({
+    vendorId,
+    sku,
+    color,
+    images,
+    sizes,
+    discount,
+    name,
+    description,
+    longDescription,
+    brand,
+    details,
+    questions,
+    category,
+    subCategories,
+    benefits,
+    ingredients,
+    parent,
+}: {
+    vendorId: string
+    sku: string
+    color: {
+        color: string
+        image: string
     }
-        :
-        {
-            vendorId: string,
-            sku: string,
-            color: any,
-            images: [],
-            sizes: Array<{ size: string, qty: string, price: string }>,
-            discount: number,
-            name: string,
-            description: string,
-            longDescription: string,
-            brand: string,
-            details: Array<{ name: string, value: string }>,
-            questions: Array<{ question: string, answer: string }>,
-            category: string,
-            subCategories: string[],
-            benefits: Array<{ name: string }>,
-            ingredients: Array<{ name: string }>,
-            parent?: string
-        }
-) => {
+    images: Array<{
+        url: string
+        public_id: string
+    }>
+    sizes: Array<{
+        size: string
+        qty: string | number
+        price: string | number
+    }>
+    discount: number
+    name: string
+    description: string
+    longDescription: string
+    brand: string
+    details: Array<{ name: string; value: string }>
+    questions: Array<{ question: string; answer: string }>
+    category: string
+    subCategories: string[]
+    benefits: Array<{ name: string }>
+    ingredients: Array<{ name: string }>
+    parent?: string
+}) => {
     try {
         await connectToDatabase()
-        const vendorObjectId = new ObjectId(vendorId)
 
-        const vendor = await Vendor.findById(vendorObjectId)
-        if (!vendor) {
+        if (!ObjectId.isValid(vendorId)) {
             return {
-                message: "Vendor not found",
-                success: false
+                success: false,
+                message: "Invalid vendor id.",
             }
+        }
+
+        if (!ObjectId.isValid(category)) {
+            return {
+                success: false,
+                message: "Invalid category id.",
+            }
+        }
+
+        if (
+            !Array.isArray(images) ||
+            images.length === 0 ||
+            images.some((img) => !img?.url || !img?.public_id)
+        ) {
+            return {
+                success: false,
+                message: "Invalid product images.",
+            }
+        }
+
+        if (!Array.isArray(sizes) || sizes.length === 0) {
+            return {
+                success: false,
+                message: "At least one size is required.",
+            }
+        }
+
+        const vendorDoc = await Vendor.findById(vendorId).lean()
+
+        if (!vendorDoc) {
+            return {
+                success: false,
+                message: "Vendor not found.",
+            }
+        }
+
+        const vendor = {
+            _id: vendorDoc._id,
+            name: vendorDoc.name,
+            email: vendorDoc.email,
+        }
+
+        const normalizedSizes = sizes.map((size) => ({
+            size: String(size.size),
+            qty: Number(size.qty),
+            price: Number(size.price),
+            sold: 0,
+        }))
+
+        const normalizedSubCategories = Array.isArray(subCategories)
+            ? subCategories.filter(Boolean).map((id) => new ObjectId(id))
+            : []
+
+        const subProductPayload = {
+            sku,
+            color,
+            images,
+            sizes: normalizedSizes,
+            discount: Number(discount) || 0,
         }
 
         if (parent) {
-            const Parent: any = await Product.findById(parent)
-            if (!Parent) {
+            if (!ObjectId.isValid(parent)) {
                 return {
-                    message: "Parent not found",
-                    success: false
+                    success: false,
+                    message: "Invalid parent product id.",
                 }
-            } else {
-                await Parent.updateOne({
+            }
+
+            const updatedParent = await Product.findOneAndUpdate(
+                {
+                    _id: parent,
+                    "vendor._id": new ObjectId(vendorId),
+                },
+                {
                     $push: {
-                        subProducts: {
-                            sku,
-                            color,
-                            images,
-                            sizes,
-                            discount,
-                        }
-                    }
-                }, { new: true })
+                        subProducts: subProductPayload,
+                    },
+                },
+                {
+                    new: true,
+                    runValidators: true,
+                }
+            ).lean()
+
+            if (!updatedParent) {
+                return {
+                    success: false,
+                    message: "Parent not found or you don't have permission to update it.",
+                }
             }
+
             return {
-                message: "Product created successfully.",
-                success: true
+                success: true,
+                message: "Product variant created successfully.",
+                product: JSON.parse(JSON.stringify(updatedParent)),
             }
-        } else {
-            const slug = slugify(name)
-            const newProduct = new Product({
-                name, description, longDescription, brand, vendor, details, questions, slug, category, benefits, ingredients, subCategories, subProducts: [
-                    {
-                        sku, color, images, sizes, discount
-                    }
-                ]
-            })
-            await newProduct.save()
-            return {
-                message: "Product created successfully.",
-                success: true
-            }
+        }
+
+        const slug = slugify(name, { lower: false })
+
+        const newProduct = await Product.create({
+            name,
+            description,
+            longDescription,
+            brand,
+            vendor,
+            details,
+            questions,
+            slug,
+            category: new ObjectId(category),
+            benefits,
+            ingredients,
+            subCategories: normalizedSubCategories,
+            subProducts: [subProductPayload],
+        })
+
+        return {
+            success: true,
+            message: "Product created successfully.",
+            product: JSON.parse(JSON.stringify(newProduct)),
         }
     } catch (error: any) {
         console.log(error)
+
         return {
-            message: error,
-            success: false
+            success: false,
+            message: error?.message || "Failed to create product.",
         }
     }
 }
@@ -334,16 +420,28 @@ export const getSingleProductById = async (
 export const getVendorProducts = async (vendorId: string) => {
     try {
         await connectToDatabase()
+
+        if (!ObjectId.isValid(vendorId)) {
+            return {
+                success: false,
+                message: "Invalid vendor id.",
+            }
+        }
+
         const vendorObjectId = new ObjectId(vendorId)
 
-        const products = await Product.find({ "vendor._id": vendorObjectId }).sort({ updatedAt: -1 }).populate({ path: "category", model: Category }).lean()
+        const products = await Product.find({ "vendor._id": vendorObjectId })
+            .sort({ updatedAt: -1 })
+            .populate({ path: "category", model: Category })
+            .lean()
 
         return JSON.parse(JSON.stringify(products))
     } catch (error: any) {
         console.log(error)
+
         return {
-            message: error,
-            success: false
+            message: error?.message || "Failed to fetch products.",
+            success: false,
         }
     }
 }
