@@ -1,0 +1,33 @@
+.table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+
+    td,
+    th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    td>*,
+    th>* {
+        margin-inline: auto;
+    }
+}
+
+.table :global(.MuiTableCell-root) {
+    border-bottom-color: rgba(148, 163, 184, 0.25);
+}
+
+.table :global(.MuiTableCell-head) {
+    color: var(--foreground) !important;
+    font-weight: 700;
+    background: #006081;
+}
+
+.table__img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}

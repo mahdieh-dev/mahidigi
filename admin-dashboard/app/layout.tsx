@@ -1,0 +1,45 @@
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
+import "./globals.css"
+import "@mantine/core/styles.css"
+import "@mantine/dates/styles.css"
+import { MantineProvider, ColorSchemeScript } from "@mantine/core"
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+})
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+})
+
+export const metadata: Metadata = {
+  title: "MahiDigi",
+  description: "Developed by MahiDev",
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+      </head>
+
+      <body className="min-h-full flex flex-col">
+        <MantineProvider defaultColorScheme="auto">
+          {children}
+        </MantineProvider>
+      </body>
+    </html>
+  )
+}
