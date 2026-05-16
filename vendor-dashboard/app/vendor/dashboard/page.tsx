@@ -2,7 +2,7 @@
 
 import DashboardCard from '@/components/vendor/dashboard/dashboardCard'
 import { calculateTotalOrders, getDashboardData } from '@/lib/database/actions/vendor/dashboard/dashboard.actions'
-import { HiCurrencyRupee } from "react-icons/hi"
+import { HiCurrencyDollar } from "react-icons/hi"
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { FaCheckCircle } from 'react-icons/fa'
 import { IoIosCloseCircle } from 'react-icons/io'
@@ -63,16 +63,16 @@ function VendorDashboardPage() {
             <div className='titleStyle'>Orders</div>
             <div className='flex justify-evenly items-center my-5'>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.totalSales} USD Total Orders
+                    <HiCurrencyDollar size={100} /> {allOrdersData?.totalSales ?? 0} USD Total Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastWeekSales} USD Last Week Orders
+                    <HiCurrencyDollar size={100} /> {allOrdersData?.lastWeekSales ?? 0} USD Last Week Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.lastMonthSales} USD Last Month Orders
+                    <HiCurrencyDollar size={100} /> {allOrdersData?.lastMonthSales ?? 0} USD Last Month Orders
                 </div>
                 <div className='h-25 gap-2.5 border-2 border-gray-400 p-2.5 w-50 shadow-2xl flex items-center justify-center rounded-3xl'>
-                    <HiCurrencyRupee size={100} /> {allOrdersData?.growthPercentage} USD Growth Percentage
+                    <HiCurrencyDollar size={100} /> {allOrdersData?.growthPercentage ?? 0} USD Growth Percentage
                 </div>
             </div>
             <div className='my-5'>

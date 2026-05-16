@@ -1,12 +1,12 @@
 "use client"
 
 import { getVendorCookiesAndFetchVendor } from '@/lib/database/actions/vendor/vendor.actions'
-import { AppShell, Burger, Group, MantineProvider } from '@mantine/core'
+import { AppShell, Burger, Group, MantineProvider, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from "sonner"
-import { ModalsProvider } from '@mantine/modals'
+import { modals, ModalsProvider } from '@mantine/modals'
 import Logo from '@/components/logo'
 import Link from 'next/link'
 import { MdOutlineCategory, MdSpaceDashboard } from "react-icons/md"
@@ -145,7 +145,24 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                                 <div>order Analytics</div>
                             </Link>
                         </div>
-                        <div onClick={logoutVendor} className='cursor-pointer flex gap-7.5 items-center p-2.5 rounded-md hover:bg-blue-100'>
+                        <div onClick={() => {
+                            modals.openConfirmModal({
+                                title: "Logout",
+                                centered: true,
+                                children: (
+                                    <Text size='sm'>
+                                        Do you want to log out?
+                                    </Text>
+                                ),
+                                labels: {
+                                    confirm: "Yes, log out",
+                                    cancel: "Cancel",
+                                },
+                                confirmProps: { color: "red" },
+                                onCancel: () => console.log("cancelled logout"),
+                                onConfirm: logoutVendor
+                            })
+                        }} className='cursor-pointer flex gap-7.5 items-center p-2.5 rounded-md hover:bg-blue-100'>
                             <IoIosLogOut size={20} />
                             <div>Logout</div>
                         </div>
