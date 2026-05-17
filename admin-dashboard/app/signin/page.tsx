@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { hasLength, isEmail, useForm } from "@mantine/form"
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/navbar'
 import { Box, Button, LoadingOverlay, Notification, NumberInput, Textarea, TextInput } from '@mantine/core'
-import { loginVendor } from '@/lib/database/actions/vendor/auth/login'
-
+import { loginAdmin } from '@/lib/database/actions/admin/auth/login'
+const jwt = require("jsonwebtoken")
 
 const SignInPage = () => {
     const form = useForm({
@@ -16,7 +16,6 @@ const SignInPage = () => {
         },
         validate: {
             email: isEmail("Invalid Email."),
-            password: hasLength({ min: 10 }, "Password must be at least 10 characters long."),
         }
     })
 
@@ -29,12 +28,12 @@ const SignInPage = () => {
     const handleSubmit = async (values: typeof form.values) => {
         try {
             setLoading(true)
-            await loginVendor(values).then(res => {
+            await loginAdmin(values).then(res => {
                 if (res.success) {
                     setSuccessMessage(true)
                     setFailureMessage({ visible: false, message: "" })
                     setTimeout(() => {
-                        router.push("/vendor/dashboard")
+                        router.push("/admin/dashboard")
                     }, 3000);
                 } else if (!res.success) {
                     setSuccessMessage(false)

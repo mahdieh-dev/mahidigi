@@ -2,9 +2,9 @@
 
 import { cookies } from "next/headers";
 import { connectToDatabase } from "./../../../connect";
-import Vendor from "@/lib/database/models/vendor.model";
+import User from "@/lib/database/models/user.model";
 
-export const loginVendor = async ({ email, password }: { email: string, password: string }) => {
+export const loginAdmin = async ({ email, password }: { email: string, password: string }) => {
     try {
         if (!email || !password) {
             return {
@@ -15,29 +15,36 @@ export const loginVendor = async ({ email, password }: { email: string, password
 
         await connectToDatabase();
 
-        const vendor = await Vendor.findOne({ email }).select("+password");
+        const admin = await User.findOne({ email }).select("+password");
 
-        if (!vendor) {
+        if (!admin) {
             return {
                 message: "Invalid email or password",
                 success: false,
             };
         }
 
-        const isPasswordCorrect = await vendor.comparePassword(password);
+        // const isPasswordCorrect = await admin.comparePassword(password);
 
-        if (!isPasswordCorrect) {
+        // if (!isPasswordCorrect) {
+        //     return {
+        //         message: "Invalid email or password",
+        //         success: false,
+        //     };
+        // }
+
+        if (admin.role !== "admin") {
             return {
-                message: "Invalid email or password",
+                message: "Unauthorized access",
                 success: false,
             };
         }
 
-        const token = vendor.getJWTToken();
+        const token = admin.getJWTToken();
 
         const cookieStore = await cookies();
 
-        cookieStore.set("vendor_token", token, {
+        cookieStore.set("admin_token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
@@ -48,13 +55,13 @@ export const loginVendor = async ({ email, password }: { email: string, password
         return {
             message: "Login successful",
             success: true,
-            vendor: JSON.parse(
+            admin: JSON.parse(
                 JSON.stringify({
-                    _id: vendor._id,
-                    name: vendor.name,
-                    email: vendor.email,
-                    role: vendor.role,
-                    verified: vendor.verified,
+                    _id: admin._id,
+                    name: admin.name,
+                    email: admin.email,
+                    role: admin.role,
+                    verified: admin.verified,
                 })
             ),
         };
@@ -62,7 +69,7 @@ export const loginVendor = async ({ email, password }: { email: string, password
         console.log(error);
 
         return {
-            message: error.message || "Failed to login vendor",
+            message: error.message || "Failed to login admin",
             success: false,
         };
     }

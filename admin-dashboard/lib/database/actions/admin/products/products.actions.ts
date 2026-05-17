@@ -160,6 +160,7 @@ export const createProduct = async ({
             ingredients,
             subCategories: normalizedSubCategories,
             subProducts: [subProductPayload],
+            vendor: new ObjectId("6a09dfbd5ba7cf73fec94489")
         })
 
         return {
@@ -238,81 +239,128 @@ export const updateProduct = async (
     input: UpdateProductInput
 ) => {
     try {
-        await connectToDatabase();
+        await connectToDatabase()
 
         if (!ObjectId.isValid(productId)) {
             return {
                 message: "Invalid product id",
                 success: false,
-            };
+            }
         }
 
         const product = await Product.findOne({
             _id: productId,
-        });
+        })
 
         if (!product) {
             return {
-                message: "Product not found or you don't have permission to edit this product",
+                message:
+                    "Product not found or you don't have permission to edit this product",
                 success: false,
-            };
+            }
         }
 
-        const subProduct = product.subProducts?.[0];
+        const subProduct = product.subProducts?.[0]
 
         if (!subProduct) {
             return {
                 message: "Sub product not found",
                 success: false,
-            };
+            }
         }
 
         if (!subProduct.color) {
-            subProduct.color = {};
+            subProduct.color = {}
         }
 
-        const normalizedSizes = input.sizes.map((item) => {
-            const existingSize = subProduct.sizes.find(
-                (size: any) => size.size === item.size
-            );
+        const normalizedSizes = Array.isArray(input.sizes)
+            ? input.sizes
+                .filter(item => item.size?.trim())
+                .map(item => {
+                    const existingSize = subProduct.sizes.find(
+                        (size: any) => size.size === item.size
+                    )
 
+                    return {
+                        size: item.size.trim(),
+                        qty: Number(item.qty) || 0,
+                        price: Number(item.price) || 0,
+                        sold: existingSize?.sold ?? 0,
+                    }
+                })
+            : []
+
+        const normalizedDetails = Array.isArray(input.details)
+            ? input.details
+                .filter(item => item.name?.trim() || item.value?.trim())
+                .map(item => ({
+                    name: item.name?.trim() || "",
+                    value: item.value?.trim() || "",
+                }))
+            : []
+
+        const normalizedBenefits = Array.isArray(input.benefits)
+            ? input.benefits
+                .filter(item => item.name?.trim())
+                .map(item => ({
+                    name: item.name.trim(),
+                }))
+            : []
+
+        const normalizedIngredients = Array.isArray(input.ingredients)
+            ? input.ingredients
+                .filter(item => item.name?.trim())
+                .map(item => ({
+                    name: item.name.trim(),
+                }))
+            : []
+
+        const normalizedQuestions = Array.isArray(input.questions)
+            ? input.questions
+                .filter(item => item.question?.trim() || item.answer?.trim())
+                .map(item => ({
+                    question: item.question?.trim() || "",
+                    answer: item.answer?.trim() || "",
+                }))
+            : []
+
+        if (normalizedSizes.length === 0) {
             return {
-                size: item.size,
-                qty: Number(item.qty),
-                price: Number(item.price),
-                sold: existingSize?.sold ?? 0,
-            };
-        });
+                message: "At least one size is required",
+                success: false,
+            }
+        }
 
-        product.name = input.name;
-        product.description = input.description;
-        product.longDescription = input.longDescription;
-        product.brand = input.brand;
-        product.details = input.details;
-        product.benefits = input.benefits;
-        product.ingredients = input.ingredients;
+        product.name = input.name
+        product.description = input.description
+        product.longDescription = input.longDescription
+        product.brand = input.brand
+        product.details = normalizedDetails
+        product.benefits = normalizedBenefits
+        product.ingredients = normalizedIngredients
+        product.questions = normalizedQuestions
 
-        subProduct.sku = input.sku;
-        subProduct.color.color = input.color;
-        subProduct.sizes = normalizedSizes;
-        subProduct.discount = input.discount;
+        subProduct.sku = input.sku
+        subProduct.color.color = input.color
+        subProduct.sizes = normalizedSizes
+        subProduct.discount = Number(input.discount) || 0
 
-        await product.save();
+        await product.save()
 
         return {
             message: "Product updated successfully",
             success: true,
-            product: JSON.parse(JSON.stringify(product))
-        };
+            product: JSON.parse(JSON.stringify(product)),
+        }
     } catch (error: any) {
-        console.log(error);
+        console.log(error)
 
         return {
             message: error.message || "Failed to update product",
             success: false,
-        };
+        }
     }
-};
+}
 
 // get single product by ID for admin
 export const getSingleProductById = async (
@@ -388,6 +436,7 @@ export const getAllProducts = async () => {
         const products = await Product.find()
             .sort({ updatedAt: -1 })
             .populate({ path: "category", model: Category })
+            .populate({ path: "vendor", model: "Vendor" })
             .lean()
 
         return JSON.parse(JSON.stringify(products))
@@ -442,6 +491,69 @@ export const getParentsAndCategories = async () => {
         return {
             message: error,
             success: false
+        }
+    }
+}
+
+// get latest reviews
+export const getLatestProductReviews = async () => {
+    try {
+        await connectToDatabase()
+
+        const reviews = await Product.aggregate([
+            { $unwind: "$reviews" },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "reviews.reviewedBy",
+                    foreignField: "_id",
+                    as: "reviewByDetails"
+                }
+            },
+            {
+                $project: {
+                    productId: "$_id",
+                    productName: "$name",
+                    productImage: { $arrayElemAt: ["$subProducts.images", 0] },
+                    productDescription: "$description",
+                    review: {
+                        rating: "$reviews.rating",
+                        review: "$reviews.review",
+                        reviewCreatedAt: "$reviews.reviewCreatedAt",
+                        verified: "$reviews.verified",
+                        _id: "$reviews._id",
+                        reviewBy: { $arrayElemAt: ["$reviewByDetails", 0] }
+                    }
+                }
+            },
+            { $sort: { "review.reviewCreatedAt": -1 } }
+        ])
+
+        return JSON.parse(JSON.stringify(reviews))
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// switch product review to verified
+export const handleVerificationChange = async (id: string, value: boolean) => {
+    try {
+        await connectToDatabase()
+        const product = await Product.findOneAndUpdate({ "reviews._id": id }, { $set: { "reviews.$.verified": value } }, { new: true })
+
+        if (!product) {
+            return {
+                success: false,
+                message: "Review not found"
+            }
+        }
+
+        return { message: "Successfully updated review", success: true }
+    } catch (error) {
+        console.log(error)
+        return {
+            success: false,
+            message: error
         }
     }
 }

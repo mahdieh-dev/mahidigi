@@ -80,7 +80,7 @@ export const getAllOrders = async (range: DateRange, isPaid: PaymentStatus, paym
 
         const filteredOrders = orders.map((order: any) => ({
             ...order,
-            products: order.products.filter((product: any) => product.vendor._id.toString() === vendorId.toString())
+            products: order.products
         }))
 
         return JSON.parse(JSON.stringify(filteredOrders))
@@ -90,7 +90,6 @@ export const getAllOrders = async (range: DateRange, isPaid: PaymentStatus, paym
 }
 
 // update product order status
-
 export const updateProductOrderStatus = async (
     orderId: string,
     productId: string,

@@ -5,6 +5,8 @@ import Category from "@/lib/database/models/category.model"
 import slugify from "slugify"
 import cloudinary from "cloudinary"
 import { base64ToBuffer } from "@/utils"
+import mongoose from "mongoose"
+const { ObjectId } = mongoose.Types
 
 // config out cloudinary
 cloudinary.v2.config({
@@ -63,6 +65,7 @@ export const createCategory = async (name: string, images: string[]) => {
             name,
             slug: slugify(name),
             images: imageUrls,
+            vendor: new ObjectId("6a09dfbd5ba7cf73fec94489")
         }).save()
 
         const categories = await Category.find().sort({ updatedAt: -1 })

@@ -1,6 +1,6 @@
 "use client"
 
-import { getTopSellingProducts, sizeAnalytics } from "@/lib/database/actions/admin/analytics/analytics.vendor.actions"
+import { getTopSellingProducts, sizeAnalytics } from "@/lib/database/actions/admin/analytics/analytics.admin.actions"
 import { useEffect, useState } from "react"
 import { Cell, Pie, PieChart } from "recharts"
 

@@ -9,6 +9,7 @@ import { getSubCategoriesByCategoryParent } from "@/lib/database/actions/admin/s
 import {
     Box,
     Button,
+    ColorInput,
     FileInput,
     Group,
     LoadingOverlay,
@@ -219,7 +220,7 @@ const CreateProductForAdminPage = () => {
             formData.append("upload_preset", "website")
 
             const uploadResponse = await fetch(
-                "https://api.cloudinary.com/v1_1/dtxh3ew7s/image/upload",
+                `https://api.cloudinary.com/v1_1/dchbekijn/image/upload`,
                 {
                     method: "POST",
                     body: formData,
@@ -248,7 +249,7 @@ const CreateProductForAdminPage = () => {
         formData.append("upload_preset", "website")
 
         const uploadResponse = await fetch(
-            "https://api.cloudinary.com/v1_1/dtxh3ew7s/image/upload",
+            `https://api.cloudinary.com/v1_1/dchbekijn/image/upload`,
             {
                 method: "POST",
                 body: formData,
@@ -396,7 +397,7 @@ const CreateProductForAdminPage = () => {
                         required
                     />
 
-                    <TextInput
+                    <ColorInput
                         {...form.getInputProps("color.color")}
                         label="Select Color"
                         description="Pick a color for the product"

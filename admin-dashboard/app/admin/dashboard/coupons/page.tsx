@@ -1,11 +1,11 @@
 "use client"
 
-import CreateVendorCoupon from '@/components/admin/dashboard/coupons/create'
-import ListAllVendorCoupons from '@/components/admin/dashboard/coupons/list'
+import CreateAdminCoupon from '@/components/admin/dashboard/coupons/create'
+import ListAllAdminCoupons from '@/components/admin/dashboard/coupons/list'
 import { getAllCoupons } from '@/lib/database/actions/admin/coupon/coupon.actions'
 import { useEffect, useState } from 'react'
 
-const VendorCouponPage = () => {
+const AdminCouponPage = () => {
     const [data, setData] = useState([])
 
     useEffect(() => {
@@ -28,10 +28,10 @@ const VendorCouponPage = () => {
 
     return (
         <div className='container'>
-            <CreateVendorCoupon setCoupons={setData} />
-            <ListAllVendorCoupons coupons={data} setCoupons={setData} />
+            <CreateAdminCoupon setCoupons={setData} />
+            <ListAllAdminCoupons coupons={data} setCoupons={setData} />
         </div>
     )
 }
 
-export default VendorCouponPage
+export default AdminCouponPage

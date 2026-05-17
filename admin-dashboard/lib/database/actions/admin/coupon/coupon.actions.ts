@@ -2,6 +2,8 @@
 
 import { connectToDatabase } from "@/lib/database/connect"
 import Coupon from "@/lib/database/models/coupon.model"
+import mongoose from "mongoose"
+const { ObjectId } = mongoose.Types
 
 // create a coupon for admin
 export const createCoupon = async (coupon: string, discount: number, startDate: any, endDate: any) => {
@@ -15,7 +17,7 @@ export const createCoupon = async (coupon: string, discount: number, startDate: 
             }
         }
         await new Coupon({
-            coupon, discount, startDate, endDate
+            coupon, discount, startDate, endDate, vendor: new ObjectId("6a09dfbd5ba7cf73fec94489")
         }).save()
 
         const coupons = await Coupon.find().sort({

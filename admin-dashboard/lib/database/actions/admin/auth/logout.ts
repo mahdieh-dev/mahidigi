@@ -2,11 +2,11 @@
 
 import { cookies } from "next/headers";
 
-export const logoutVendor = async () => {
+export const logoutAdmin = async () => {
     try {
         const cookieStore = await cookies();
 
-        cookieStore.delete("vendor_token");
+        cookieStore.delete("admin_token");
 
         return {
             message: "Logout successful",

@@ -15,7 +15,7 @@ function OrdersPage() {
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("-")
 
     useEffect(() => {
-        async function getAllOrdersForVendor() {
+        async function getAllOrdersForAdmin() {
             try {
                 await getAllOrders(range, isPaid, paymentMethod).then(res => {
                     setOrders(res)
@@ -25,7 +25,7 @@ function OrdersPage() {
             }
         }
 
-        getAllOrdersForVendor()
+        getAllOrdersForAdmin()
     }, [range, isPaid, paymentMethod])
 
     return (

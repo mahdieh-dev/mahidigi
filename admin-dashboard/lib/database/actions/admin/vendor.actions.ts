@@ -1,43 +1,9 @@
 "use server"
 
-import { verify_vendor } from "@/utils"
 import Vendor from "../../models/vendor.model"
 import { connectToDatabase } from "../../connect"
 import mongoose from "mongoose"
-import { cookies } from "next/headers"
 const { ObjectId } = mongoose.Types
-
-
-// get vendor cookies for vendor
-export const getVendorCookiesAndFetchVendor = async () => {
-    try {
-        const vendorObjectId = await verify_vendor()
-
-        await connectToDatabase()
-
-        const vendor = await Vendor.findById(vendorObjectId)
-        if (!vendorObjectId) {
-            const cookieStore = await cookies()
-            cookieStore.delete("vendor_token")
-            return {
-                message: "Vendor does not exist",
-                success: false,
-                vendor: []
-            }
-        }
-
-        return {
-            success: true,
-            vendor: JSON.parse(JSON.stringify(vendor))
-        }
-    } catch (error: any) {
-        console.log(error)
-        return {
-            message: error,
-            success: false
-        }
-    }
-}
 
 // get single vendor for vendor
 export const getSingleVendor = async (vendorId: string) => {

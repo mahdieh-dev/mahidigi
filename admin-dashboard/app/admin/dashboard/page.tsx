@@ -13,7 +13,7 @@ import ProductData from '@/components/admin/dashboard/product.performance'
 import LowStockProducts from '@/components/admin/dashboard/low-stock.products'
 import OutOfStockProducts from '@/components/admin/dashboard/out-of-stock.products'
 
-function VendorDashboardPage() {
+function AdminDashboardPage() {
     const [data, setData] = useState<{
         orders: any;
         products: any;
@@ -135,4 +135,4 @@ function VendorDashboardPage() {
     )
 }
 
-export default VendorDashboardPage
+export default AdminDashboardPage

@@ -1,5 +1,6 @@
 "use server"
 
+import { base64ToBuffer } from "@/utils"
 import cloudinary from "cloudinary"
 
 // config out cloudinary
@@ -26,10 +27,6 @@ export const fetchAllWebsiteBanners = async () => {
 // upload website banners for admin
 export const uploadWebsiteBannerImages = async (images: any) => {
     try {
-        const base64ToBuffer = (base64: any): any => {
-            const base64String = base64.split(";base64,").pop()
-            return Buffer.from(base64String, "base64")
-        }
 
         const imageUploadPromises = images.map(async (base64Image: any) => {
             const buffer = base64ToBuffer(base64Image)
@@ -45,7 +42,7 @@ export const uploadWebsiteBannerImages = async (images: any) => {
             // Optionally add a unique identifier for the public_id
             formData.append("public_id", `${Date.now()}`)
 
-            const response = await fetch("https://api.cloudinary.com/v1_1/dtxh3ew7s/image/upload", {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`, {
                 method: "POST",
                 body: formData,
             })
@@ -103,7 +100,7 @@ export const uploadAppBannerImages = async (images: any) => {
             // Optionally add a unique identifier for the public_id
             formData.append("public_id", `${Date.now()}`)
 
-            const response = await fetch("https://api.cloudinary.com/v1_1/dtxh3ew7s/image/upload", {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`, {
                 method: "POST",
                 body: formData,
             })

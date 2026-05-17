@@ -7,6 +7,7 @@ import { base64ToBuffer } from '@/utils';
 import cloudinary from 'cloudinary';
 import mongoose from 'mongoose';
 import slugify from 'slugify'
+const { ObjectId } = mongoose.Types
 
 // config cloudinary
 cloudinary.v2.config({
@@ -101,7 +102,8 @@ export const createSubCategory = async (name: string, parent: string, images: an
             name,
             parent,
             slug: slugify(name),
-            images: imageUrls
+            images: imageUrls,
+            vendor: new ObjectId("6a09dfbd5ba7cf73fec94489")
         }).save()
         const subCategories = await SubCategory.find().sort({ updatedAt: -1 })
 

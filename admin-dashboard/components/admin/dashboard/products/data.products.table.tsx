@@ -32,6 +32,7 @@ function ProductsDataTable({ products }: { products: any[] }) {
     const getProductDetails = async (id: string) => {
         try {
             await getSingleProductById(id).then(res => {
+                console.log(res)
                 if (res.success) {
                     setData(res)
                 } else {
@@ -57,6 +58,7 @@ function ProductsDataTable({ products }: { products: any[] }) {
         { field: "product_id", headerName: "Product ID", width: 200 },
         { field: "product_name", headerName: "Product Name", width: 150 },
         { field: "category", headerName: "Category", width: 130 },
+        { field: "vendor", headerName: "Vendor", width: 130 },
         { field: "price", headerName: "Price", width: 100 },
         { field: "sizes", headerName: "Sizes", width: 50 },
         {
@@ -72,7 +74,7 @@ function ProductsDataTable({ products }: { products: any[] }) {
                     <Drawer opened={opened} position='right' onClose={() => setOpened(false)} title="Update Product" size="lg">
                         <UpdateProductComponent data={data} setOpened={setOpened} />
                     </Drawer>
-                    <FaEdit size={20} onClick={() => { setOpened(true); getProductDetails(params.row.product._id) }} className='cursor-pointer' />
+                    <FaEdit size={20} onClick={() => { setOpened(true); getProductDetails(params.row.product_id) }} className='cursor-pointer' />
                 </div>
             )
         },
@@ -91,7 +93,7 @@ function ProductsDataTable({ products }: { products: any[] }) {
                         },
                         confirmProps: { color: "red" },
                         onCancel: () => console.log("Cancel"),
-                        onConfirm: () => handleDeleteProduct(params.row.product._id)
+                        onConfirm: () => handleDeleteProduct(params.row.product_id)
                     })
                 }}>
                     <RiDeleteBin6Fill size={20} />
@@ -114,6 +116,7 @@ function ProductsDataTable({ products }: { products: any[] }) {
                 product_id: product._id,
                 image: product.subProducts[0].images[0].url,
                 category: product.category.name,
+                vendor: product.vendor.name,
                 price: sizePrices,
                 sizes: sizeLabels,
                 view: "-",

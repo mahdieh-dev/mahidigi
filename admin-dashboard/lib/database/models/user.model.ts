@@ -1,4 +1,7 @@
 import mongoose from "mongoose"
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
+
 const UserSchema = new mongoose.Schema({
     clerkId: {
         type: String,
@@ -9,6 +12,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false
     },
     image: {
         type: String,
@@ -55,7 +63,19 @@ const UserSchema = new mongoose.Schema({
             default: true
         }
     },
-},{timestamps: true})
+}, { timestamps: true })
+
+// sign in admin with JWT
+UserSchema.methods.getJWTToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES
+    })
+}
+
+// comparing the password for admin
+UserSchema.methods.comparePassword = async function (enteredPassword: string) {
+    return await bcrypt.compare(enteredPassword, this.password)
+}
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema)
 export default User

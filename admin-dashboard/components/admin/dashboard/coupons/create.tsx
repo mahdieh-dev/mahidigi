@@ -36,7 +36,7 @@ const CreateAdminCoupon = ({ setCoupons }: { setCoupons: any }) => {
     const submitHandler = async (values: typeof form.values) => {
         try {
             const [startDate, endDate] = values.dateRange;
-            await createCoupon(values.name, values.discount, startDate, endDate, vendor).then(res => {
+            await createCoupon(values.name, values.discount, startDate, endDate).then(res => {
                 console.log("Create coupon response: ", res)
                 if (res.success) {
                     setCoupons(res.coupons)

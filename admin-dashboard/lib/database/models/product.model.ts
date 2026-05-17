@@ -20,6 +20,15 @@ const reviewSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        reviewCreatedAt: {
+            type: Date,
+            required: true,
+        },
+        verified: {
+            type: Boolean,
+            default: false,
+            required: true
+        }
     },
     { timestamps: true }
 )

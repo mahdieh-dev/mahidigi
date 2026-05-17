@@ -1,6 +1,6 @@
 "use client"
 
-import { AppShell, Burger, Group } from '@mantine/core'
+import { AppShell, Burger, Button, Group } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import React from 'react'
 import { ModalsProvider } from '@mantine/modals'
@@ -39,6 +39,15 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                             hiddenFrom='sm'
                         />
                         <Logo />
+                        <Link href={"/admin/dashboard/reviews"}>
+                            <Button variant={"outline"}>Reviews</Button>
+                        </Link>
+                        <Link href={"/admin/dashboard/topbars"}>
+                            <Button variant={"outline"}>TopBars</Button>
+                        </Link>
+                        <Link href={"/admin/dashboard/offers"}>
+                            <Button variant={"outline"}>HomeScreen Offers</Button>
+                        </Link>
                     </Group>
                 </AppShell.Header>
                 <AppShell.Navbar p="md">
