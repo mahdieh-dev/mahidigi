@@ -36,7 +36,7 @@ function CartDrawer() {
     ])
 
     const handleOnClickCartMenu = () => {
-        setCartMenuOpen(true)
+        setCartMenuOpen(prev => !prev)
     }
 
     const removeItem = (id: string) => {
@@ -51,7 +51,7 @@ function CartDrawer() {
 
     return (
         <div>
-            <Sheet>
+            <Sheet open={cartMenuOpen} onOpenChange={handleOnClickCartMenu}>
                 <SheetTrigger asChild>
                     <Button variant={"ghost"} size={"icon"} className='relative'>
                         <ShoppingBag size={24} />

@@ -14,11 +14,11 @@ import { Input } from './ui/input'
 function SignInPopup() {
     const [accountMenuOpen, setAccountMenuOpen] = useAtom(accountMenuOpenAtom)
     const handleOnClickAccountMenu = () => {
-        setAccountMenuOpen(true)
+        setAccountMenuOpen(prev => !prev)
     }
 
     return (
-        <Dialog>
+        <Dialog open={accountMenuOpen} onOpenChange={handleOnClickAccountMenu}>
             <DialogTrigger asChild>
                 <Button variant={"ghost"} size="icon" className='lg:flex' onClick={handleOnClickAccountMenu} >
                     <User size={24} />
